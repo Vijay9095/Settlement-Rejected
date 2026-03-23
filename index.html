@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MMROADWAYS Settlement Rejected Forms</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfpJjcsr-Nt4SKMaS6bY9isgIldml_TtA",
+      authDomain: "settlement-rejected-form.firebaseapp.com",
+      projectId: "settlement-rejected-form",
+      storageBucket: "settlement-rejected-form.firebasestorage.app",
+      messagingSenderId: "1097537980853",
+      appId: "1:1097537980853:web:9b7c3c4102a890a146f1fc",
+      measurementId: "G-WVBXNP8N11"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.__db = db;
+    window.__collection = collection;
+    window.__addDoc = addDoc;
+    window.__getDocs = getDocs;
+    window.__serverTimestamp = serverTimestamp;
+    window.__query = query;
+    window.__orderBy = orderBy;
+    window.__firebaseReady = true;
+    window.dispatchEvent(new Event('firebaseReady'));
+  </script>
+
+  <style>
+    :root {
+      --primary: #1a56a4;
+      --primary-light: #e8f0fb;
+      --accent: #f59e0b;
+      --accent-light: #fef3c7;
+      --success: #10b981;
+      --danger: #ef4444;
+      --bg: #f0f4fa;
+      --surface: #ffffff;
+      --surface2: #f7f9fd;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #dbe4f0;
+      --shadow: 0 2px 16px rgba(26,86,164,0.09);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #1a56a4 0%, #2563eb 60%, #1e40af 100%);
+      color: white;
+      padding: 0 32px;
+      box-shadow: 0 3px 18px rgba(26,86,164,0.22);
+      position: sticky; top: 0; z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+
+    .logo-text h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+    }
+
+    .logo-text span {
+      font-size: 11px;
+      opacity: 0.8;
+      font-weight: 300;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    nav { display: flex; gap: 6px; }
+
+    nav button {
+      background: rgba(255,255,255,0.12);
+      color: white;
+      border: 1.5px solid rgba(255,255,255,0.18);
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    nav button:hover, nav button.active {
+      background: rgba(255,255,255,0.26);
+      border-color: rgba(255,255,255,0.45);
+    }
+
+    nav button.active {
+      background: white;
+      color: var(--primary);
+      border-color: white;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── PAGE TITLE ── */
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+    .page-sub {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 22px;
+      display: flex; align-items: center; gap: 8px;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    /* ── FORM ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 24px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    .req { color: var(--danger); font-size: 13px; }
+
+    input, select, textarea {
+      font-family: 'Poppins', sans-serif;
+      font-size: 13.5px;
+      color: var(--text);
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 14px;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26,86,164,0.10);
+      background: white;
+    }
+
+    input.error, select.error, textarea.error {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(239,68,68,0.10);
+    }
+
+    .error-msg {
+      font-size: 11.5px;
+      color: var(--danger);
+      display: none;
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+
+
+    /* ── SUBMIT BUTTON ── */
+    .btn-primary {
+      background: linear-gradient(135deg, #1a56a4, #2563eb);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 36px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 14px rgba(26,86,164,0.25);
+    }
+
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,86,164,0.32); }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex; align-items: center; gap: 7px;
+    }
+
+    .btn-secondary:hover { background: var(--primary-light); }
+
+    .form-actions {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 12px; margin-top: 8px;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 30px; right: 30px;
+      background: var(--success);
+      color: white;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex; align-items: center; gap: 9px;
+      box-shadow: 0 6px 24px rgba(16,185,129,0.28);
+      z-index: 9999;
+      transform: translateY(80px); opacity: 0;
+      transition: all .3s cubic-bezier(.4,0,.2,1);
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.error { background: var(--danger); box-shadow: 0 6px 24px rgba(239,68,68,0.28); }
+
+    /* ── REPORT SECTION ── */
+    .report-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .search-box {
+      display: flex; align-items: center;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 9px;
+      padding: 8px 14px;
+      gap: 8px;
+      width: 260px;
+    }
+
+    .search-box input {
+      border: none; background: transparent;
+      padding: 0; font-size: 13.5px; width: 100%;
+      box-shadow: none;
+    }
+
+    .search-box:focus-within { border-color: var(--primary); }
+
+    .stats-row {
+      display: flex; gap: 16px; margin-bottom: 22px; flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 24px;
+      flex: 1; min-width: 160px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card .val {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-card .lbl {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      min-width: 700px;
+    }
+
+    thead tr {
+      background: linear-gradient(90deg, #1a56a4, #2563eb);
+      color: white;
+    }
+
+    thead th {
+      padding: 13px 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12.5px;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .15s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--primary-light); }
+
+    tbody td {
+      padding: 12px 16px;
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+
+    .badge-red { background: #fee2e2; color: #b91c1c; }
+    .badge-yellow { background: #fef3c7; color: #92400e; }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+
+    .no-data {
+      text-align: center;
+      padding: 60px 0;
+      color: var(--text-muted);
+    }
+    .no-data .icon { font-size: 44px; margin-bottom: 10px; }
+    .no-data p { font-size: 14px; }
+
+    /* ── LOADING SPINNER ── */
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+      .header-inner { flex-direction: column; height: auto; padding: 14px 0; gap: 10px; }
+      main { padding: 20px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo-area">
+      <div class="logo-icon">🚌</div>
+      <div class="logo-text">
+        <h1>MMROADWAYS</h1>
+        <span>Settlement Rejected Forms</span>
+      </div>
+    </div>
+    <nav>
+      <button class="active" id="tab-entry" onclick="switchTab('entry')">
+        ✏️ Data Entry
+      </button>
+      <button id="tab-report" onclick="switchTab('report')">
+        📊 Report
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+
+  <!-- DATA ENTRY SECTION -->
+  <div class="section active" id="section-entry">
+    <div class="page-title">🗂️ New Rejected Form Entry</div>
+    <div class="page-sub">Fill in all mandatory fields marked with <span style="color:var(--danger)">*</span></div>
+
+    <div class="card">
+      <div class="card-title">📝 Settlement Rejection Details</div>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="created_date">Created Date <span class="req">*</span></label>
+          <input type="date" id="created_date" />
+          <span class="error-msg" id="err-date">Please select a date.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="vehicle">Vehicle <span class="req">*</span></label>
+          <input type="text" id="vehicle" placeholder="e.g. TN 01 AB 1234" />
+          <span class="error-msg" id="err-vehicle">Please enter vehicle number.</span>
+        </div>
+
+        <div class="form-group full">
+          <label for="rejected_reason">Rejected Reason <span class="req">*</span></label>
+          <textarea id="rejected_reason" placeholder="Describe the reason for rejection..."></textarea>
+          <span class="error-msg" id="err-reason">Please enter the rejected reason.</span>
+        </div>
+
+        <div class="form-group full">
+          <label for="name">Created Name <span class="req">*</span></label>
+          <input type="text" id="name" placeholder="Enter full name" />
+          <span class="error-msg" id="err-name">Please enter the name.</span>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="resetForm()">🔄 Reset</button>
+        <button class="btn-primary" id="submit-btn" onclick="submitForm()">
+          <span id="btn-text">💾 Submit Entry</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT SECTION -->
+  <div class="section" id="section-report">
+    <div class="page-title">📊 Report</div>
+    <div class="page-sub">All submitted rejection entries — read only, no deletions allowed</div>
+
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card"><div class="val" id="stat-total">—</div><div class="lbl">Total Entries</div></div>
+      <div class="stat-card"><div class="val" id="stat-today">—</div><div class="lbl">Today's Entries</div></div>
+      <div class="stat-card"><div class="val" id="stat-vehicles">—</div><div class="lbl">Unique Vehicles</div></div>
+    </div>
+
+    <div class="report-toolbar">
+      <div class="search-box">
+        🔍
+        <input type="text" id="search-input" placeholder="Search name, vehicle, reason…" oninput="filterTable()" />
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-secondary" onclick="exportImage()">🖼️ Download as Image</button>
+        <button class="btn-primary" onclick="exportExcel()">⬇️ Export to Excel</button>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div class="table-wrap">
+        <table id="report-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Created Date</th>
+              <th>Vehicle</th>
+              <th>Rejected Reason</th>
+              <th>Created Name</th>
+              <th>Submitted At</th>
+            </tr>
+          </thead>
+          <tbody id="report-tbody">
+            <tr><td colspan="7">
+              <div class="no-data">
+                <div class="icon">🔄</div>
+                <p>Loading data…</p>
+              </div>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toast-icon">✅</span>
+  <span id="toast-msg">Entry submitted successfully!</span>
+</div>
+
+<script>
+  // ─── Tab switching ───
+  function switchTab(tab) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById('section-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    if (tab === 'report') loadReport();
+  }
+
+  // ─── Validation ───
+  function validate() {
+    let ok = true;
+    const fields = [
+      { id: 'created_date', err: 'err-date' },
+      { id: 'vehicle', err: 'err-vehicle' },
+      { id: 'rejected_reason', err: 'err-reason' },
+      { id: 'name', err: 'err-name' },
+    ];
+    fields.forEach(f => {
+      const el = document.getElementById(f.id);
+      const err = document.getElementById(f.err);
+      if (!el.value.trim()) {
+        el.classList.add('error');
+        err.style.display = 'block';
+        ok = false;
+      } else {
+        el.classList.remove('error');
+        err.style.display = 'none';
+      }
+    });
+    return ok;
+  }
+
+  // ─── Submit form ───
+  async function submitForm() {
+    if (!validate()) return;
+    if (!window.__firebaseReady) { showToast('Firebase not ready, try again.', true); return; }
+
+    const btn = document.getElementById('submit-btn');
+    const btnText = document.getElementById('btn-text');
+    btn.disabled = true;
+    btnText.innerHTML = '<span class="spinner"></span> Saving…';
+
+    const data = {
+      createdDate: document.getElementById('created_date').value,
+      vehicle: document.getElementById('vehicle').value.trim().toUpperCase(),
+      rejectedReason: document.getElementById('rejected_reason').value.trim(),
+      name: document.getElementById('name').value.trim(),
+      submittedAt: window.__serverTimestamp()
+    };
+
+    try {
+      await window.__addDoc(window.__collection(window.__db, 'rejected_forms'), data);
+      showToast('✅ Entry submitted successfully!');
+      resetForm();
+    } catch (err) {
+      console.error(err);
+      showToast('❌ Failed to save. Check your connection.', true);
+    } finally {
+      btn.disabled = false;
+      btnText.innerHTML = '💾 Submit Entry';
+    }
+  }
+
+  // ─── Reset form ───
+  function resetForm() {
+    ['created_date','vehicle','rejected_reason','name'].forEach(id => {
+      const el = document.getElementById(id);
+      el.value = '';
+      el.classList.remove('error');
+    });
+    document.querySelectorAll('.error-msg').forEach(e => e.style.display = 'none');
+    document.getElementById('created_date').value = new Date().toISOString().split('T')[0];
+  }
+
+  // ─── Toast ───
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    t.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.className = 'toast', 3200);
+  }
+
+  // ─── Load report ───
+  let allRows = [];
+
+  async function loadReport() {
+    if (!window.__firebaseReady) {
+      setTimeout(loadReport, 500); return;
+    }
+    const tbody = document.getElementById('report-tbody');
+    tbody.innerHTML = '<tr><td colspan="6"><div class="no-data"><div class="icon">🔄</div><p>Loading…</p></div></td></tr>';
+    try {
+      const q = window.__query(
+        window.__collection(window.__db, 'rejected_forms'),
+        window.__orderBy('submittedAt', 'desc')
+      );
+      const snap = await window.__getDocs(q);
+      allRows = [];
+      snap.forEach(doc => allRows.push({ id: doc.id, ...doc.data() }));
+      renderTable(allRows);
+      updateStats(allRows);
+    } catch (err) {
+      console.error(err);
+      tbody.innerHTML = '<tr><td colspan="7"><div class="no-data"><div class="icon">⚠️</div><p>Failed to load data.</p></div></td></tr>';
+    }
+  }
+
+  function renderTable(rows) {
+    const tbody = document.getElementById('report-tbody');
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="no-data"><div class="icon">📭</div><p>No entries found.</p></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = rows.map((r, i) => {
+      const submAt = r.submittedAt?.toDate ? r.submittedAt.toDate().toLocaleString('en-IN') : '—';
+      return `
+        <tr>
+          <td><b>${i + 1}</b></td>
+          <td>${r.createdDate || '—'}</td>
+          <td><span class="badge badge-blue">${r.vehicle || '—'}</span></td>
+          <td style="max-width:260px;white-space:pre-wrap;word-break:break-word;">${r.rejectedReason || '—'}</td>
+          <td><b>${r.name || '—'}</b></td>
+          <td style="white-space:nowrap;font-size:12px;color:var(--text-muted);">${submAt}</td>
+        </tr>`;
+    }).join('');
+  }
+
+  function updateStats(rows) {
+    document.getElementById('stat-total').textContent = rows.length;
+    const today = new Date().toISOString().split('T')[0];
+    const todayCount = rows.filter(r => r.createdDate === today).length;
+    document.getElementById('stat-today').textContent = todayCount;
+    const uniq = new Set(rows.map(r => r.vehicle)).size;
+    document.getElementById('stat-vehicles').textContent = uniq;
+  }
+
+  function filterTable() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    const filtered = allRows.filter(r =>
+      (r.name || '').toLowerCase().includes(q) ||
+      (r.vehicle || '').toLowerCase().includes(q) ||
+      (r.rejectedReason || '').toLowerCase().includes(q)
+    );
+    renderTable(filtered);
+  }
+
+  // ─── Export Excel (proper .xlsx with SheetJS) ───
+  function exportExcel() {
+    if (!allRows.length) { showToast('No data to export!', true); return; }
+
+    // Build data array: header row + data rows
+    const headers = ['S.No', 'Created Date', 'Vehicle', 'Rejected Reason', 'Created Name', 'Submitted At'];
+
+    const dataRows = allRows.map((r, i) => {
+      const submAt = r.submittedAt?.toDate ? r.submittedAt.toDate().toLocaleString('en-IN') : '';
+      return [
+        i + 1,
+        r.createdDate || '',
+        r.vehicle || '',
+        r.rejectedReason || '',
+        r.name || '',
+        submAt
+      ];
+    });
+
+    // Create worksheet from array of arrays
+    const wsData = [headers, ...dataRows];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    // Column widths
+    ws['!cols'] = [
+      { wch: 6 },   // S.No
+      { wch: 14 },  // Created Date
+      { wch: 16 },  // Vehicle
+      { wch: 40 },  // Rejected Reason
+      { wch: 22 },  // Name
+      { wch: 22 },  // Submitted At
+    ];
+
+    // Style header row (bold + background) — SheetJS CE supports limited styling via cell objects
+    headers.forEach((h, c) => {
+      const cellRef = XLSX.utils.encode_cell({ r: 0, c });
+      if (!ws[cellRef]) return;
+      ws[cellRef].s = {
+        font: { bold: true, color: { rgb: 'FFFFFF' } },
+        fill: { fgColor: { rgb: '1A56A4' } },
+        alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
+        border: {
+          top:    { style: 'thin', color: { rgb: 'AAAAAA' } },
+          bottom: { style: 'thin', color: { rgb: 'AAAAAA' } },
+          left:   { style: 'thin', color: { rgb: 'AAAAAA' } },
+          right:  { style: 'thin', color: { rgb: 'AAAAAA' } }
+        }
+      };
+    });
+
+    // Style data rows — alternate row shading + borders
+    dataRows.forEach((row, r) => {
+      row.forEach((_, c) => {
+        const cellRef = XLSX.utils.encode_cell({ r: r + 1, c });
+        if (!ws[cellRef]) ws[cellRef] = { v: '', t: 's' };
+        ws[cellRef].s = {
+          fill: { fgColor: { rgb: r % 2 === 0 ? 'EBF2FF' : 'FFFFFF' } },
+          alignment: { vertical: 'center', wrapText: true },
+          border: {
+            top:    { style: 'thin', color: { rgb: 'CCCCCC' } },
+            bottom: { style: 'thin', color: { rgb: 'CCCCCC' } },
+            left:   { style: 'thin', color: { rgb: 'CCCCCC' } },
+            right:  { style: 'thin', color: { rgb: 'CCCCCC' } }
+          }
+        };
+      });
+    });
+
+    // Freeze header row
+    ws['!freeze'] = { xSplit: 0, ySplit: 1, topLeftCell: 'A2', activePane: 'bottomLeft' };
+
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Rejected Forms');
+
+    // Add a summary sheet
+    const today = new Date().toISOString().split('T')[0];
+    const todayCount = allRows.filter(r => r.createdDate === today).length;
+    const uniqVehicles = [...new Set(allRows.map(r => r.vehicle))];
+
+    const summaryData = [
+      ['MMROADWAYS — Settlement Rejected Forms Summary'],
+      [''],
+      ['Report Generated', new Date().toLocaleString('en-IN')],
+      ['Total Entries', allRows.length],
+      ["Today's Entries", todayCount],
+      ['Unique Vehicles', uniqVehicles.length],
+      [''],
+      ['Vehicles List', uniqVehicles.join(', ')]
+    ];
+    const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+    wsSummary['!cols'] = [{ wch: 22 }, { wch: 40 }];
+    XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+
+    // Download
+    XLSX.writeFile(wb, 'MMROADWAYS_Rejected_Forms_' + today + '.xlsx');
+    showToast('📥 Excel file downloaded!');
+  }
+
+  // ─── Export as Image (html2canvas) ───
+  async function exportImage() {
+    if (!allRows.length) { showToast('No data to export!', true); return; }
+
+    showToast('🖼️ Generating image…');
+
+    // Dynamically load html2canvas
+    if (!window.html2canvas) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      });
+    }
+
+    // Build a clean off-screen table for capture
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `
+      position:fixed; left:-9999px; top:0;
+      font-family:'Poppins',sans-serif; background:#fff;
+      padding:28px 32px; width:900px;
+    `;
+
+    const today = new Date().toLocaleDateString('en-IN');
+    wrap.innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #dbe4f0;">
+        <div style="background:linear-gradient(135deg,#1a56a4,#2563eb);color:white;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;">🚌</div>
+        <div>
+          <div style="font-size:18px;font-weight:700;color:#1a56a4;font-family:'Georgia',serif;">MMROADWAYS</div>
+          <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Settlement Rejected Forms Report</div>
+        </div>
+        <div style="margin-left:auto;text-align:right;font-size:12px;color:#64748b;">
+          Generated: ${today}<br>Total Records: ${allRows.length}
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+        <thead>
+          <tr style="background:linear-gradient(90deg,#1a56a4,#2563eb);">
+            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;border-radius:0;">#</th>
+            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Created Date</th>
+            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Vehicle</th>
+            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Rejected Reason</th>
+            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Created Name</th>
+            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Submitted At</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${allRows.map((r, i) => {
+            const submAt = r.submittedAt?.toDate ? r.submittedAt.toDate().toLocaleString('en-IN') : '—';
+            const bg = i % 2 === 0 ? '#f0f5ff' : '#ffffff';
+            return `<tr style="background:${bg};border-bottom:1px solid #dbe4f0;">
+              <td style="padding:9px 12px;font-weight:700;color:#1a56a4;">${i+1}</td>
+              <td style="padding:9px 12px;">${r.createdDate || '—'}</td>
+              <td style="padding:9px 12px;"><span style="background:#dbeafe;color:#1d4ed8;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;">${r.vehicle || '—'}</span></td>
+              <td style="padding:9px 12px;max-width:220px;word-break:break-word;">${r.rejectedReason || '—'}</td>
+              <td style="padding:9px 12px;font-weight:600;">${r.name || '—'}</td>
+              <td style="padding:9px 12px;font-size:11px;color:#64748b;">${submAt}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <div style="margin-top:16px;font-size:11px;color:#94a3b8;text-align:center;">
+        MMROADWAYS — Settlement Rejected Forms • ${today}
+      </div>
+    `;
+
+    document.body.appendChild(wrap);
+
+    try {
+      const canvas = await html2canvas(wrap, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'MMROADWAYS_Report_' + new Date().toISOString().split('T')[0] + '.png';
+      a.click();
+      showToast('🖼️ Image downloaded!');
+    } catch(e) {
+      showToast('❌ Image export failed.', true);
+    } finally {
+      document.body.removeChild(wrap);
+    }
+  }
+
+  // ─── Set today as default date ───
+  document.getElementById('created_date').value = new Date().toISOString().split('T')[0];
+
+  // ─── Firebase ready listener ───
+  window.addEventListener('firebaseReady', () => {
+    console.log('Firebase ready ✅');
+  });
+</script>
+</body>
+</html>
