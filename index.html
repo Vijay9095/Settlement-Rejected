@@ -43,6 +43,7 @@
       --accent-light: #fef3c7;
       --success: #10b981;
       --danger: #ef4444;
+      --warning: #f59e0b;
       --bg: #f0f4fa;
       --surface: #ffffff;
       --surface2: #f7f9fd;
@@ -229,8 +230,6 @@
 
     textarea { resize: vertical; min-height: 80px; }
 
-
-
     /* ── SUBMIT BUTTON ── */
     .btn-primary {
       background: linear-gradient(135deg, #1a56a4, #2563eb);
@@ -266,6 +265,37 @@
 
     .btn-secondary:hover { background: var(--primary-light); }
 
+    /* ── IMPORT BUTTON ── */
+    .btn-import {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex; align-items: center; gap: 7px;
+      box-shadow: 0 4px 14px rgba(16,185,129,0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-import:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,185,129,0.35); }
+    .btn-import:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    /* Hidden file input trick */
+    #excel-file-input {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      font-size: 0;
+    }
+
     .form-actions {
       display: flex; align-items: center; justify-content: flex-end;
       gap: 12px; margin-top: 8px;
@@ -290,6 +320,174 @@
 
     .toast.show { transform: translateY(0); opacity: 1; }
     .toast.error { background: var(--danger); box-shadow: 0 6px 24px rgba(239,68,68,0.28); }
+    .toast.warning { background: var(--warning); box-shadow: 0 6px 24px rgba(245,158,11,0.28); }
+
+    /* ── IMPORT PREVIEW MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.55);
+      z-index: 500;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s;
+    }
+
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--surface);
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(26,86,164,0.22);
+      width: 100%;
+      max-width: 900px;
+      max-height: 90vh;
+      display: flex; flex-direction: column;
+      transform: translateY(24px) scale(0.97);
+      transition: transform .25s cubic-bezier(.4,0,.2,1);
+      overflow: hidden;
+    }
+
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+    .modal-header {
+      padding: 22px 28px 18px;
+      border-bottom: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .modal-header h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .modal-close {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      width: 34px; height: 34px;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      transition: all .15s;
+    }
+
+    .modal-close:hover { background: #fee2e2; color: var(--danger); border-color: #fca5a5; }
+
+    .modal-body {
+      padding: 20px 28px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .import-info-bar {
+      display: flex; gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .import-info-chip {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    .import-info-chip.green {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .import-info-chip.orange {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .preview-table-wrap {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      max-height: 340px;
+      overflow-y: auto;
+    }
+
+    .preview-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      min-width: 600px;
+    }
+
+    .preview-table thead tr {
+      background: linear-gradient(90deg, #1a56a4, #2563eb);
+      color: white;
+      position: sticky; top: 0; z-index: 2;
+    }
+
+    .preview-table thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .preview-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .15s;
+    }
+
+    .preview-table tbody tr:hover { background: var(--primary-light); }
+
+    .preview-table tbody td {
+      padding: 10px 14px;
+      vertical-align: middle;
+      color: var(--text);
+    }
+
+    .row-skip { opacity: .45; text-decoration: line-through; }
+
+    .skip-badge {
+      display: inline-flex; align-items: center;
+      background: #fef3c7;
+      color: #92400e;
+      border-radius: 20px;
+      padding: 2px 9px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .ok-badge {
+      display: inline-flex; align-items: center;
+      background: #d1fae5;
+      color: #065f46;
+      border-radius: 20px;
+      padding: 2px 9px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .modal-footer {
+      padding: 16px 28px 20px;
+      border-top: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .modal-footer-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex; align-items: center; gap: 6px;
+    }
 
     /* ── REPORT SECTION ── */
     .report-toolbar {
@@ -394,6 +592,19 @@
     .badge-red { background: #fee2e2; color: #b91c1c; }
     .badge-yellow { background: #fef3c7; color: #92400e; }
     .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .badge-green { background: #d1fae5; color: #065f46; }
+
+    .source-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10.5px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 20px;
+      margin-left: 6px;
+    }
+
+    .source-firebase { background: #fff3cd; color: #856404; }
+    .source-import { background: #d1fae5; color: #065f46; }
 
     .no-data {
       text-align: center;
@@ -415,12 +626,31 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── PROGRESS BAR ── */
+    .progress-wrap {
+      background: var(--border);
+      border-radius: 20px;
+      height: 6px;
+      margin-top: 10px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #059669, #10b981);
+      border-radius: 20px;
+      transition: width .2s;
+      width: 0%;
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 700px) {
       .form-grid { grid-template-columns: 1fr; }
       .form-group.full { grid-column: 1; }
       .header-inner { flex-direction: column; height: auto; padding: 14px 0; gap: 10px; }
       main { padding: 20px 14px; }
+      .modal { border-radius: 14px; }
     }
   </style>
 </head>
@@ -504,6 +734,7 @@
       <div class="stat-card"><div class="val" id="stat-total">—</div><div class="lbl">Total Entries</div></div>
       <div class="stat-card"><div class="val" id="stat-today">—</div><div class="lbl">Today's Entries</div></div>
       <div class="stat-card"><div class="val" id="stat-vehicles">—</div><div class="lbl">Unique Vehicles</div></div>
+      <div class="stat-card"><div class="val" id="stat-imported" style="color:#059669;">—</div><div class="lbl">Imported Entries</div></div>
     </div>
 
     <div class="report-toolbar">
@@ -511,7 +742,12 @@
         🔍
         <input type="text" id="search-input" placeholder="Search name, vehicle, reason…" oninput="filterTable()" />
       </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        <!-- IMPORT BUTTON -->
+        <button class="btn-import" id="import-btn" title="Import data from Excel file">
+          📥 Import Excel
+          <input type="file" id="excel-file-input" accept=".xlsx,.xls,.csv" onchange="handleImportFile(event)" />
+        </button>
         <button class="btn-secondary" onclick="exportImage()">🖼️ Download as Image</button>
         <button class="btn-primary" onclick="exportExcel()">⬇️ Export to Excel</button>
       </div>
@@ -528,6 +764,7 @@
               <th>Rejected Reason</th>
               <th>Created Name</th>
               <th>Submitted At</th>
+              <th>Source</th>
             </tr>
           </thead>
           <tbody id="report-tbody">
@@ -551,7 +788,61 @@
   <span id="toast-msg">Entry submitted successfully!</span>
 </div>
 
+<!-- ── IMPORT PREVIEW MODAL ── -->
+<div class="modal-overlay" id="import-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📥 Import from Excel — Preview</h2>
+      <button class="modal-close" onclick="closeImportModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="import-info-bar" id="import-info-bar">
+        <!-- filled dynamically -->
+      </div>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px;">
+        Review the rows below before importing. Rows with missing required fields will be skipped automatically.
+      </p>
+      <div class="preview-table-wrap">
+        <table class="preview-table" id="preview-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Status</th>
+              <th>Created Date</th>
+              <th>Vehicle</th>
+              <th>Rejected Reason</th>
+              <th>Created Name</th>
+            </tr>
+          </thead>
+          <tbody id="preview-tbody"></tbody>
+        </table>
+      </div>
+      <div class="progress-wrap" id="progress-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <p id="progress-label" style="font-size:12px;color:var(--text-muted);margin-top:8px;display:none;"></p>
+    </div>
+    <div class="modal-footer">
+      <div class="modal-footer-note">
+        ℹ️ Imported data is shown in the report with a <span class="source-tag source-import">📂 Imported</span> tag.
+        It is stored in your browser session only (not saved to Firebase).
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-secondary" onclick="closeImportModal()">Cancel</button>
+        <button class="btn-import" id="confirm-import-btn" onclick="confirmImport()" style="position:relative;">
+          <span id="confirm-import-text">✅ Import Valid Rows</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+  // ─── State ───
+  let allRows = [];            // Firebase rows
+  let importedRows = [];       // Locally imported rows (session only)
+  let pendingImportRows = [];  // Rows parsed from Excel, waiting for confirmation
+
   // ─── Tab switching ───
   function switchTab(tab) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -588,7 +879,7 @@
   // ─── Submit form ───
   async function submitForm() {
     if (!validate()) return;
-    if (!window.__firebaseReady) { showToast('Firebase not ready, try again.', true); return; }
+    if (!window.__firebaseReady) { showToast('Firebase not ready, try again.', 'error'); return; }
 
     const btn = document.getElementById('submit-btn');
     const btnText = document.getElementById('btn-text');
@@ -609,7 +900,7 @@
       resetForm();
     } catch (err) {
       console.error(err);
-      showToast('❌ Failed to save. Check your connection.', true);
+      showToast('❌ Failed to save. Check your connection.', 'error');
     } finally {
       btn.disabled = false;
       btnText.innerHTML = '💾 Submit Entry';
@@ -628,22 +919,20 @@
   }
 
   // ─── Toast ───
-  function showToast(msg, isError = false) {
+  function showToast(msg, type = 'success') {
     const t = document.getElementById('toast');
     document.getElementById('toast-msg').textContent = msg;
-    t.className = 'toast show' + (isError ? ' error' : '');
-    setTimeout(() => t.className = 'toast', 3200);
+    t.className = 'toast show' + (type === 'error' ? ' error' : type === 'warning' ? ' warning' : '');
+    setTimeout(() => t.className = 'toast', 3400);
   }
 
-  // ─── Load report ───
-  let allRows = [];
-
+  // ─── Load report from Firebase ───
   async function loadReport() {
     if (!window.__firebaseReady) {
       setTimeout(loadReport, 500); return;
     }
     const tbody = document.getElementById('report-tbody');
-    tbody.innerHTML = '<tr><td colspan="6"><div class="no-data"><div class="icon">🔄</div><p>Loading…</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7"><div class="no-data"><div class="icon">🔄</div><p>Loading…</p></div></td></tr>';
     try {
       const q = window.__query(
         window.__collection(window.__db, 'rejected_forms'),
@@ -651,23 +940,48 @@
       );
       const snap = await window.__getDocs(q);
       allRows = [];
-      snap.forEach(doc => allRows.push({ id: doc.id, ...doc.data() }));
-      renderTable(allRows);
-      updateStats(allRows);
+      snap.forEach(doc => allRows.push({ id: doc.id, _source: 'firebase', ...doc.data() }));
+      renderCombinedTable();
     } catch (err) {
       console.error(err);
       tbody.innerHTML = '<tr><td colspan="7"><div class="no-data"><div class="icon">⚠️</div><p>Failed to load data.</p></div></td></tr>';
     }
   }
 
+  // ─── Combine Firebase + Imported rows and render ───
+  function renderCombinedTable(filterQuery = '') {
+    const combined = [...importedRows, ...allRows];
+    const q = filterQuery.toLowerCase();
+    const filtered = q
+      ? combined.filter(r =>
+          (r.name || '').toLowerCase().includes(q) ||
+          (r.vehicle || '').toLowerCase().includes(q) ||
+          (r.rejectedReason || '').toLowerCase().includes(q)
+        )
+      : combined;
+
+    renderTable(filtered);
+    updateStats(combined);
+  }
+
   function renderTable(rows) {
     const tbody = document.getElementById('report-tbody');
     if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="6"><div class="no-data"><div class="icon">📭</div><p>No entries found.</p></div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7"><div class="no-data"><div class="icon">📭</div><p>No entries found.</p></div></td></tr>';
       return;
     }
     tbody.innerHTML = rows.map((r, i) => {
-      const submAt = r.submittedAt?.toDate ? r.submittedAt.toDate().toLocaleString('en-IN') : '—';
+      let submAt = '—';
+      if (r._source === 'import') {
+        submAt = '<em style="color:var(--text-muted);font-size:12px;">Imported</em>';
+      } else if (r.submittedAt?.toDate) {
+        submAt = r.submittedAt.toDate().toLocaleString('en-IN');
+      }
+
+      const sourceTag = r._source === 'import'
+        ? '<span class="source-tag source-import">📂 Imported</span>'
+        : '<span class="source-tag source-firebase">🔥 Live</span>';
+
       return `
         <tr>
           <td><b>${i + 1}</b></td>
@@ -676,6 +990,7 @@
           <td style="max-width:260px;white-space:pre-wrap;word-break:break-word;">${r.rejectedReason || '—'}</td>
           <td><b>${r.name || '—'}</b></td>
           <td style="white-space:nowrap;font-size:12px;color:var(--text-muted);">${submAt}</td>
+          <td>${sourceTag}</td>
         </tr>`;
     }).join('');
   }
@@ -687,52 +1002,284 @@
     document.getElementById('stat-today').textContent = todayCount;
     const uniq = new Set(rows.map(r => r.vehicle)).size;
     document.getElementById('stat-vehicles').textContent = uniq;
+    const impCount = rows.filter(r => r._source === 'import').length;
+    document.getElementById('stat-imported').textContent = impCount;
   }
 
   function filterTable() {
-    const q = document.getElementById('search-input').value.toLowerCase();
-    const filtered = allRows.filter(r =>
-      (r.name || '').toLowerCase().includes(q) ||
-      (r.vehicle || '').toLowerCase().includes(q) ||
-      (r.rejectedReason || '').toLowerCase().includes(q)
-    );
-    renderTable(filtered);
+    const q = document.getElementById('search-input').value;
+    renderCombinedTable(q);
   }
+
+  // ════════════════════════════════════════
+  //  IMPORT FROM EXCEL — CORE LOGIC
+  // ════════════════════════════════════════
+
+  /**
+   * Called when user picks a file.
+   * Reads + parses the Excel/CSV, shows preview modal.
+   */
+  function handleImportFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Reset file input so same file can be re-selected
+    event.target.value = '';
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+
+        // Use first sheet
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+
+        // Convert to JSON (header row = first row)
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+          defval: '',
+          raw: false,
+          dateNF: 'yyyy-mm-dd'
+        });
+
+        if (!jsonData.length) {
+          showToast('⚠️ Excel file is empty or has no data rows.', 'warning');
+          return;
+        }
+
+        parseAndPreviewRows(jsonData, file.name);
+      } catch (err) {
+        console.error('Excel parse error:', err);
+        showToast('❌ Could not read the Excel file. Make sure it is a valid .xlsx or .xls file.', 'error');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  /**
+   * Flexible column mapper — tries many possible column name variations
+   * so the import works even if headers are slightly different.
+   */
+  function findColumn(headers, aliases) {
+    for (const alias of aliases) {
+      const match = headers.find(h => h.toLowerCase().replace(/[\s_\-]/g, '').includes(alias.toLowerCase().replace(/[\s_\-]/g, '')));
+      if (match) return match;
+    }
+    return null;
+  }
+
+  function parseAndPreviewRows(jsonData, fileName) {
+    const headers = Object.keys(jsonData[0]);
+
+    // Map columns flexibly
+    const colDate    = findColumn(headers, ['createddate', 'created_date', 'date', 'Created Date', 'Date']);
+    const colVehicle = findColumn(headers, ['vehicle', 'vehicleno', 'vehicle_no', 'bus', 'Vehicle']);
+    const colReason  = findColumn(headers, ['rejectedreason', 'rejected_reason', 'reason', 'rejection', 'Rejected Reason']);
+    const colName    = findColumn(headers, ['createdname', 'created_name', 'name', 'employee', 'Created Name']);
+
+    pendingImportRows = jsonData.map((row, idx) => {
+      const rawDate    = colDate    ? String(row[colDate] || '').trim()    : '';
+      const rawVehicle = colVehicle ? String(row[colVehicle] || '').trim() : '';
+      const rawReason  = colReason  ? String(row[colReason] || '').trim()  : '';
+      const rawName    = colName    ? String(row[colName] || '').trim()    : '';
+
+      // Normalise date — accept yyyy-mm-dd, dd/mm/yyyy, dd-mm-yyyy, mm/dd/yyyy
+      const normDate = normaliseDate(rawDate);
+
+      const isValid = normDate && rawVehicle && rawReason && rawName;
+
+      return {
+        _rowIndex: idx + 2,  // Excel row number (1-indexed header + 1)
+        _valid: isValid,
+        _skipReason: !isValid ? getMissingFields(normDate, rawVehicle, rawReason, rawName) : '',
+        createdDate: normDate,
+        vehicle: rawVehicle.toUpperCase(),
+        rejectedReason: rawReason,
+        name: rawName,
+        _source: 'import'
+      };
+    });
+
+    const validCount  = pendingImportRows.filter(r => r._valid).length;
+    const skipCount   = pendingImportRows.length - validCount;
+
+    // Build info bar
+    const infoBar = document.getElementById('import-info-bar');
+    infoBar.innerHTML = `
+      <span class="import-info-chip">📄 File: ${fileName}</span>
+      <span class="import-info-chip">📋 Total rows: ${pendingImportRows.length}</span>
+      <span class="import-info-chip green">✅ Valid: ${validCount}</span>
+      ${skipCount > 0 ? `<span class="import-info-chip orange">⚠️ Skipped: ${skipCount}</span>` : ''}
+    `;
+
+    // Build preview table
+    const previewTbody = document.getElementById('preview-tbody');
+    previewTbody.innerHTML = pendingImportRows.map((r, i) => {
+      const statusBadge = r._valid
+        ? `<span class="ok-badge">✅ OK</span>`
+        : `<span class="skip-badge">⚠️ Skip — ${r._skipReason}</span>`;
+      const rowClass = r._valid ? '' : 'row-skip';
+      return `
+        <tr class="${rowClass}">
+          <td>${i + 1}</td>
+          <td>${statusBadge}</td>
+          <td>${r.createdDate || '—'}</td>
+          <td>${r.vehicle || '—'}</td>
+          <td style="max-width:220px;word-break:break-word;">${r.rejectedReason || '—'}</td>
+          <td>${r.name || '—'}</td>
+        </tr>`;
+    }).join('');
+
+    // Update confirm button label
+    document.getElementById('confirm-import-text').textContent = `✅ Import ${validCount} Valid Row${validCount !== 1 ? 's' : ''}`;
+
+    if (validCount === 0) {
+      document.getElementById('confirm-import-btn').disabled = true;
+    } else {
+      document.getElementById('confirm-import-btn').disabled = false;
+    }
+
+    openImportModal();
+  }
+
+  function getMissingFields(date, vehicle, reason, name) {
+    const missing = [];
+    if (!date)    missing.push('Date');
+    if (!vehicle) missing.push('Vehicle');
+    if (!reason)  missing.push('Reason');
+    if (!name)    missing.push('Name');
+    return missing.join(', ') + ' missing';
+  }
+
+  /**
+   * Normalise various date formats to yyyy-mm-dd
+   */
+  function normaliseDate(raw) {
+    if (!raw) return '';
+
+    // Already yyyy-mm-dd
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+
+    // dd/mm/yyyy or dd-mm-yyyy
+    const dmy = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (dmy) {
+      const d = dmy[1].padStart(2,'0'), m = dmy[2].padStart(2,'0'), y = dmy[3];
+      if (parseInt(m) > 0 && parseInt(m) <= 12) return `${y}-${m}-${d}`;
+    }
+
+    // mm/dd/yyyy (US style) — if first segment > 12 it must be day
+    const mdy = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (mdy) {
+      const a = parseInt(mdy[1]), b = parseInt(mdy[2]);
+      if (a > 12 && b <= 12) {
+        return `${mdy[3]}-${mdy[2].padStart(2,'0')}-${mdy[1].padStart(2,'0')}`;
+      }
+    }
+
+    // Try JS Date parse as fallback
+    const d = new Date(raw);
+    if (!isNaN(d.getTime())) {
+      return d.toISOString().split('T')[0];
+    }
+
+    return '';
+  }
+
+  // ─── Confirm import ───
+  async function confirmImport() {
+    const validRows = pendingImportRows.filter(r => r._valid);
+    if (!validRows.length) return;
+
+    const btn = document.getElementById('confirm-import-btn');
+    const btnText = document.getElementById('confirm-import-text');
+    btn.disabled = true;
+    btnText.innerHTML = '<span class="spinner"></span> Importing…';
+
+    // Show progress
+    const progressWrap = document.getElementById('progress-wrap');
+    const progressBar  = document.getElementById('progress-bar');
+    const progressLabel = document.getElementById('progress-label');
+    progressWrap.style.display = 'block';
+    progressLabel.style.display = 'block';
+
+    // Simulate row-by-row addition with progress (instant, just visual delay for UX)
+    for (let i = 0; i < validRows.length; i++) {
+      importedRows.unshift(validRows[i]); // Add to front (newest first)
+      const pct = Math.round(((i + 1) / validRows.length) * 100);
+      progressBar.style.width = pct + '%';
+      progressLabel.textContent = `Importing row ${i + 1} of ${validRows.length}…`;
+      // Small yield to let UI update
+      if (i % 10 === 0) await new Promise(r => setTimeout(r, 8));
+    }
+
+    progressLabel.textContent = `✅ ${validRows.length} rows imported successfully!`;
+    progressBar.style.width = '100%';
+
+    await new Promise(r => setTimeout(r, 600));
+
+    closeImportModal();
+    renderCombinedTable(document.getElementById('search-input').value);
+    showToast(`✅ ${validRows.length} rows imported from Excel!`);
+
+    // Reset
+    btn.disabled = false;
+    btnText.textContent = '✅ Import Valid Rows';
+    progressWrap.style.display = 'none';
+    progressBar.style.width = '0%';
+    progressLabel.style.display = 'none';
+    pendingImportRows = [];
+  }
+
+  // ─── Modal helpers ───
+  function openImportModal() {
+    document.getElementById('import-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeImportModal() {
+    document.getElementById('import-modal').classList.remove('open');
+    document.body.style.overflow = '';
+    pendingImportRows = [];
+  }
+
+  // Close modal on backdrop click
+  document.getElementById('import-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeImportModal();
+  });
 
   // ─── Export Excel (proper .xlsx with SheetJS) ───
   function exportExcel() {
-    if (!allRows.length) { showToast('No data to export!', true); return; }
+    const combined = [...importedRows, ...allRows];
+    if (!combined.length) { showToast('No data to export!', 'error'); return; }
 
-    // Build data array: header row + data rows
-    const headers = ['S.No', 'Created Date', 'Vehicle', 'Rejected Reason', 'Created Name', 'Submitted At'];
+    const headers = ['S.No', 'Created Date', 'Vehicle', 'Rejected Reason', 'Created Name', 'Submitted At', 'Source'];
 
-    const dataRows = allRows.map((r, i) => {
-      const submAt = r.submittedAt?.toDate ? r.submittedAt.toDate().toLocaleString('en-IN') : '';
+    const dataRows = combined.map((r, i) => {
+      let submAt = '';
+      if (r._source === 'import') {
+        submAt = 'Imported';
+      } else if (r.submittedAt?.toDate) {
+        submAt = r.submittedAt.toDate().toLocaleString('en-IN');
+      }
       return [
         i + 1,
         r.createdDate || '',
         r.vehicle || '',
         r.rejectedReason || '',
         r.name || '',
-        submAt
+        submAt,
+        r._source === 'import' ? 'Imported' : 'Firebase'
       ];
     });
 
-    // Create worksheet from array of arrays
     const wsData = [headers, ...dataRows];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-    // Column widths
     ws['!cols'] = [
-      { wch: 6 },   // S.No
-      { wch: 14 },  // Created Date
-      { wch: 16 },  // Vehicle
-      { wch: 40 },  // Rejected Reason
-      { wch: 22 },  // Name
-      { wch: 22 },  // Submitted At
+      { wch: 6 }, { wch: 14 }, { wch: 16 }, { wch: 40 }, { wch: 22 }, { wch: 22 }, { wch: 12 }
     ];
 
-    // Style header row (bold + background) — SheetJS CE supports limited styling via cell objects
     headers.forEach((h, c) => {
       const cellRef = XLSX.utils.encode_cell({ r: 0, c });
       if (!ws[cellRef]) return;
@@ -741,15 +1288,14 @@
         fill: { fgColor: { rgb: '1A56A4' } },
         alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
         border: {
-          top:    { style: 'thin', color: { rgb: 'AAAAAA' } },
+          top: { style: 'thin', color: { rgb: 'AAAAAA' } },
           bottom: { style: 'thin', color: { rgb: 'AAAAAA' } },
-          left:   { style: 'thin', color: { rgb: 'AAAAAA' } },
-          right:  { style: 'thin', color: { rgb: 'AAAAAA' } }
+          left: { style: 'thin', color: { rgb: 'AAAAAA' } },
+          right: { style: 'thin', color: { rgb: 'AAAAAA' } }
         }
       };
     });
 
-    // Style data rows — alternate row shading + borders
     dataRows.forEach((row, r) => {
       row.forEach((_, c) => {
         const cellRef = XLSX.utils.encode_cell({ r: r + 1, c });
@@ -767,23 +1313,23 @@
       });
     });
 
-    // Freeze header row
     ws['!freeze'] = { xSplit: 0, ySplit: 1, topLeftCell: 'A2', activePane: 'bottomLeft' };
 
-    // Create workbook
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Rejected Forms');
 
-    // Add a summary sheet
     const today = new Date().toISOString().split('T')[0];
-    const todayCount = allRows.filter(r => r.createdDate === today).length;
-    const uniqVehicles = [...new Set(allRows.map(r => r.vehicle))];
+    const todayCount = combined.filter(r => r.createdDate === today).length;
+    const uniqVehicles = [...new Set(combined.map(r => r.vehicle))];
+    const importCount = importedRows.length;
 
     const summaryData = [
       ['MMROADWAYS — Settlement Rejected Forms Summary'],
       [''],
       ['Report Generated', new Date().toLocaleString('en-IN')],
-      ['Total Entries', allRows.length],
+      ['Total Entries', combined.length],
+      ['Firebase Entries', allRows.length],
+      ['Imported Entries', importCount],
       ["Today's Entries", todayCount],
       ['Unique Vehicles', uniqVehicles.length],
       [''],
@@ -793,18 +1339,17 @@
     wsSummary['!cols'] = [{ wch: 22 }, { wch: 40 }];
     XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
 
-    // Download
     XLSX.writeFile(wb, 'MMROADWAYS_Rejected_Forms_' + today + '.xlsx');
     showToast('📥 Excel file downloaded!');
   }
 
   // ─── Export as Image (html2canvas) ───
   async function exportImage() {
-    if (!allRows.length) { showToast('No data to export!', true); return; }
+    const combined = [...importedRows, ...allRows];
+    if (!combined.length) { showToast('No data to export!', 'error'); return; }
 
     showToast('🖼️ Generating image…');
 
-    // Dynamically load html2canvas
     if (!window.html2canvas) {
       await new Promise((res, rej) => {
         const s = document.createElement('script');
@@ -814,7 +1359,6 @@
       });
     }
 
-    // Build a clean off-screen table for capture
     const wrap = document.createElement('div');
     wrap.style.cssText = `
       position:fixed; left:-9999px; top:0;
@@ -831,23 +1375,23 @@
           <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Settlement Rejected Forms Report</div>
         </div>
         <div style="margin-left:auto;text-align:right;font-size:12px;color:#64748b;">
-          Generated: ${today}<br>Total Records: ${allRows.length}
+          Generated: ${today}<br>Total Records: ${combined.length}
         </div>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
         <thead>
           <tr style="background:linear-gradient(90deg,#1a56a4,#2563eb);">
-            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;border-radius:0;">#</th>
+            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">#</th>
             <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Created Date</th>
             <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Vehicle</th>
             <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Rejected Reason</th>
             <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Created Name</th>
-            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Submitted At</th>
+            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Source</th>
           </tr>
         </thead>
         <tbody>
-          ${allRows.map((r, i) => {
-            const submAt = r.submittedAt?.toDate ? r.submittedAt.toDate().toLocaleString('en-IN') : '—';
+          ${combined.map((r, i) => {
+            let submAt = r._source === 'import' ? 'Imported' : (r.submittedAt?.toDate ? r.submittedAt.toDate().toLocaleString('en-IN') : '—');
             const bg = i % 2 === 0 ? '#f0f5ff' : '#ffffff';
             return `<tr style="background:${bg};border-bottom:1px solid #dbe4f0;">
               <td style="padding:9px 12px;font-weight:700;color:#1a56a4;">${i+1}</td>
@@ -855,7 +1399,7 @@
               <td style="padding:9px 12px;"><span style="background:#dbeafe;color:#1d4ed8;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;">${r.vehicle || '—'}</span></td>
               <td style="padding:9px 12px;max-width:220px;word-break:break-word;">${r.rejectedReason || '—'}</td>
               <td style="padding:9px 12px;font-weight:600;">${r.name || '—'}</td>
-              <td style="padding:9px 12px;font-size:11px;color:#64748b;">${submAt}</td>
+              <td style="padding:9px 12px;font-size:11px;color:#64748b;">${r._source === 'import' ? '📂 Imported' : '🔥 Live'}</td>
             </tr>`;
           }).join('')}
         </tbody>
@@ -875,7 +1419,7 @@
       a.click();
       showToast('🖼️ Image downloaded!');
     } catch(e) {
-      showToast('❌ Image export failed.', true);
+      showToast('❌ Image export failed.', 'error');
     } finally {
       document.body.removeChild(wrap);
     }
