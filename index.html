@@ -6,34 +6,6 @@
   <title>MMROADWAYS Settlement Rejected Forms</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- Firebase SDKs -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCfpJjcsr-Nt4SKMaS6bY9isgIldml_TtA",
-      authDomain: "settlement-rejected-form.firebaseapp.com",
-      projectId: "settlement-rejected-form",
-      storageBucket: "settlement-rejected-form.firebasestorage.app",
-      messagingSenderId: "1097537980853",
-      appId: "1:1097537980853:web:9b7c3c4102a890a146f1fc",
-      measurementId: "G-WVBXNP8N11"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    window.__db = db;
-    window.__collection = collection;
-    window.__addDoc = addDoc;
-    window.__getDocs = getDocs;
-    window.__serverTimestamp = serverTimestamp;
-    window.__query = query;
-    window.__orderBy = orderBy;
-    window.__firebaseReady = true;
-    window.dispatchEvent(new Event('firebaseReady'));
-  </script>
 
   <style>
     :root {
@@ -230,7 +202,7 @@
 
     textarea { resize: vertical; min-height: 80px; }
 
-    /* ── SUBMIT BUTTON ── */
+    /* ── BUTTONS ── */
     .btn-primary {
       background: linear-gradient(135deg, #1a56a4, #2563eb);
       color: white;
@@ -265,7 +237,23 @@
 
     .btn-secondary:hover { background: var(--primary-light); }
 
-    /* ── IMPORT BUTTON ── */
+    .btn-danger {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 22px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex; align-items: center; gap: 7px;
+      box-shadow: 0 4px 14px rgba(239,68,68,0.25);
+    }
+
+    .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(239,68,68,0.35); }
+
     .btn-import {
       background: linear-gradient(135deg, #059669, #10b981);
       color: white;
@@ -286,7 +274,6 @@
     .btn-import:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,185,129,0.35); }
     .btn-import:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 
-    /* Hidden file input trick */
     #excel-file-input {
       position: absolute;
       top: 0; left: 0;
@@ -300,6 +287,24 @@
       display: flex; align-items: center; justify-content: flex-end;
       gap: 12px; margin-top: 8px;
     }
+
+    /* ── STORAGE INFO BAR ── */
+    .storage-info {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border: 1.5px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 12.5px;
+      color: #1e40af;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .storage-info span { font-weight: 600; }
 
     /* ── TOAST ── */
     .toast {
@@ -400,15 +405,8 @@
       font-weight: 600;
     }
 
-    .import-info-chip.green {
-      background: #d1fae5;
-      color: #065f46;
-    }
-
-    .import-info-chip.orange {
-      background: #fef3c7;
-      color: #92400e;
-    }
+    .import-info-chip.green { background: #d1fae5; color: #065f46; }
+    .import-info-chip.orange { background: #fef3c7; color: #92400e; }
 
     .preview-table-wrap {
       border-radius: 10px;
@@ -456,38 +454,61 @@
 
     .skip-badge {
       display: inline-flex; align-items: center;
-      background: #fef3c7;
-      color: #92400e;
-      border-radius: 20px;
-      padding: 2px 9px;
-      font-size: 11px;
-      font-weight: 600;
+      background: #fef3c7; color: #92400e;
+      border-radius: 20px; padding: 2px 9px;
+      font-size: 11px; font-weight: 600;
     }
 
     .ok-badge {
       display: inline-flex; align-items: center;
-      background: #d1fae5;
-      color: #065f46;
-      border-radius: 20px;
-      padding: 2px 9px;
-      font-size: 11px;
-      font-weight: 600;
+      background: #d1fae5; color: #065f46;
+      border-radius: 20px; padding: 2px 9px;
+      font-size: 11px; font-weight: 600;
     }
 
     .modal-footer {
       padding: 16px 28px 20px;
       border-top: 1.5px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
-      gap: 12px;
-      flex-shrink: 0;
-      flex-wrap: wrap;
+      gap: 12px; flex-shrink: 0; flex-wrap: wrap;
     }
 
     .modal-footer-note {
-      font-size: 12px;
-      color: var(--text-muted);
+      font-size: 12px; color: var(--text-muted);
       display: flex; align-items: center; gap: 6px;
     }
+
+    /* ── CONFIRM DELETE MODAL ── */
+    .confirm-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(15,23,42,0.6);
+      z-index: 600;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s;
+    }
+
+    .confirm-modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .confirm-modal {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+      transform: scale(0.95);
+      transition: transform .2s;
+    }
+
+    .confirm-modal-overlay.open .confirm-modal { transform: scale(1); }
+
+    .confirm-modal .icon { font-size: 48px; margin-bottom: 14px; }
+    .confirm-modal h3 { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .confirm-modal p { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+    .confirm-modal-btns { display: flex; gap: 12px; justify-content: center; }
 
     /* ── REPORT SECTION ── */
     .report-toolbar {
@@ -527,17 +548,8 @@
       box-shadow: var(--shadow);
     }
 
-    .stat-card .val {
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--primary);
-    }
-
-    .stat-card .lbl {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 2px;
-    }
+    .stat-card .val { font-size: 26px; font-weight: 700; color: var(--primary); }
+    .stat-card .lbl { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
     /* ── TABLE ── */
     .table-wrap {
@@ -589,32 +601,23 @@
       font-weight: 600;
     }
 
-    .badge-red { background: #fee2e2; color: #b91c1c; }
-    .badge-yellow { background: #fef3c7; color: #92400e; }
     .badge-blue { background: #dbeafe; color: #1d4ed8; }
-    .badge-green { background: #d1fae5; color: #065f46; }
 
     .source-tag {
       display: inline-flex; align-items: center; gap: 4px;
-      font-size: 10.5px;
-      font-weight: 500;
-      padding: 2px 7px;
-      border-radius: 20px;
-      margin-left: 6px;
+      font-size: 10.5px; font-weight: 500;
+      padding: 2px 7px; border-radius: 20px;
     }
 
-    .source-firebase { background: #fff3cd; color: #856404; }
+    .source-local  { background: #e0f2fe; color: #0369a1; }
     .source-import { background: #d1fae5; color: #065f46; }
 
     .no-data {
-      text-align: center;
-      padding: 60px 0;
-      color: var(--text-muted);
+      text-align: center; padding: 60px 0; color: var(--text-muted);
     }
     .no-data .icon { font-size: 44px; margin-bottom: 10px; }
     .no-data p { font-size: 14px; }
 
-    /* ── LOADING SPINNER ── */
     .spinner {
       display: inline-block;
       width: 18px; height: 18px;
@@ -626,25 +629,17 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── PROGRESS BAR ── */
     .progress-wrap {
-      background: var(--border);
-      border-radius: 20px;
-      height: 6px;
-      margin-top: 10px;
-      overflow: hidden;
-      display: none;
+      background: var(--border); border-radius: 20px;
+      height: 6px; margin-top: 10px; overflow: hidden; display: none;
     }
 
     .progress-bar {
       height: 100%;
       background: linear-gradient(90deg, #059669, #10b981);
-      border-radius: 20px;
-      transition: width .2s;
-      width: 0%;
+      border-radius: 20px; transition: width .2s; width: 0%;
     }
 
-    /* ── RESPONSIVE ── */
     @media (max-width: 700px) {
       .form-grid { grid-template-columns: 1fr; }
       .form-group.full { grid-column: 1; }
@@ -667,12 +662,8 @@
       </div>
     </div>
     <nav>
-      <button class="active" id="tab-entry" onclick="switchTab('entry')">
-        ✏️ Data Entry
-      </button>
-      <button id="tab-report" onclick="switchTab('report')">
-        📊 Report
-      </button>
+      <button class="active" id="tab-entry" onclick="switchTab('entry')">✏️ Data Entry</button>
+      <button id="tab-report" onclick="switchTab('report')">📊 Report</button>
     </nav>
   </div>
 </header>
@@ -684,6 +675,12 @@
   <div class="section active" id="section-entry">
     <div class="page-title">🗂️ New Rejected Form Entry</div>
     <div class="page-sub">Fill in all mandatory fields marked with <span style="color:var(--danger)">*</span></div>
+
+    <!-- Storage info -->
+    <div class="storage-info">
+      💾 Data is saved to <span>Local Storage</span> — works offline, stored in this browser only.
+      <span id="storage-count-entry" style="margin-left:auto;background:#dbeafe;padding:3px 10px;border-radius:20px;font-size:12px;">0 records saved</span>
+    </div>
 
     <div class="card">
       <div class="card-title">📝 Settlement Rejection Details</div>
@@ -719,7 +716,7 @@
       <div class="form-actions">
         <button class="btn-secondary" onclick="resetForm()">🔄 Reset</button>
         <button class="btn-primary" id="submit-btn" onclick="submitForm()">
-          <span id="btn-text">💾 Submit Entry</span>
+          <span id="btn-text">💾 Save Entry</span>
         </button>
       </div>
     </div>
@@ -728,9 +725,9 @@
   <!-- REPORT SECTION -->
   <div class="section" id="section-report">
     <div class="page-title">📊 Report</div>
-    <div class="page-sub">All submitted rejection entries — read only, no deletions allowed</div>
+    <div class="page-sub">All saved rejection entries — stored in your browser's local storage</div>
 
-    <div class="stats-row" id="stats-row">
+    <div class="stats-row">
       <div class="stat-card"><div class="val" id="stat-total">—</div><div class="lbl">Total Entries</div></div>
       <div class="stat-card"><div class="val" id="stat-today">—</div><div class="lbl">Today's Entries</div></div>
       <div class="stat-card"><div class="val" id="stat-vehicles">—</div><div class="lbl">Unique Vehicles</div></div>
@@ -743,13 +740,13 @@
         <input type="text" id="search-input" placeholder="Search name, vehicle, reason…" oninput="filterTable()" />
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-        <!-- IMPORT BUTTON -->
         <button class="btn-import" id="import-btn" title="Import data from Excel file">
           📥 Import Excel
           <input type="file" id="excel-file-input" accept=".xlsx,.xls,.csv" onchange="handleImportFile(event)" />
         </button>
         <button class="btn-secondary" onclick="exportImage()">🖼️ Download as Image</button>
         <button class="btn-primary" onclick="exportExcel()">⬇️ Export to Excel</button>
+        <button class="btn-danger" onclick="confirmClearAll()">🗑️ Clear All Data</button>
       </div>
     </div>
 
@@ -763,15 +760,15 @@
               <th>Vehicle</th>
               <th>Rejected Reason</th>
               <th>Created Name</th>
-              <th>Submitted At</th>
+              <th>Saved At</th>
               <th>Source</th>
             </tr>
           </thead>
           <tbody id="report-tbody">
             <tr><td colspan="7">
               <div class="no-data">
-                <div class="icon">🔄</div>
-                <p>Loading data…</p>
+                <div class="icon">📭</div>
+                <p>No entries yet.</p>
               </div>
             </td></tr>
           </tbody>
@@ -784,11 +781,10 @@
 
 <!-- TOAST -->
 <div class="toast" id="toast">
-  <span id="toast-icon">✅</span>
-  <span id="toast-msg">Entry submitted successfully!</span>
+  <span id="toast-msg">Entry saved successfully!</span>
 </div>
 
-<!-- ── IMPORT PREVIEW MODAL ── -->
+<!-- IMPORT PREVIEW MODAL -->
 <div class="modal-overlay" id="import-modal">
   <div class="modal">
     <div class="modal-header">
@@ -796,22 +792,16 @@
       <button class="modal-close" onclick="closeImportModal()">✕</button>
     </div>
     <div class="modal-body">
-      <div class="import-info-bar" id="import-info-bar">
-        <!-- filled dynamically -->
-      </div>
+      <div class="import-info-bar" id="import-info-bar"></div>
       <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px;">
-        Review the rows below before importing. Rows with missing required fields will be skipped automatically.
+        Review rows before importing. Rows with missing required fields will be skipped.
       </p>
       <div class="preview-table-wrap">
-        <table class="preview-table" id="preview-table">
+        <table class="preview-table">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Status</th>
-              <th>Created Date</th>
-              <th>Vehicle</th>
-              <th>Rejected Reason</th>
-              <th>Created Name</th>
+              <th>#</th><th>Status</th><th>Created Date</th>
+              <th>Vehicle</th><th>Rejected Reason</th><th>Created Name</th>
             </tr>
           </thead>
           <tbody id="preview-tbody"></tbody>
@@ -824,8 +814,7 @@
     </div>
     <div class="modal-footer">
       <div class="modal-footer-note">
-        ℹ️ Imported data is shown in the report with a <span class="source-tag source-import">📂 Imported</span> tag.
-        It is stored in your browser session only (not saved to Firebase).
+        ℹ️ Imported rows will be <strong>saved to Local Storage</strong> permanently.
       </div>
       <div style="display:flex;gap:10px;">
         <button class="btn-secondary" onclick="closeImportModal()">Cancel</button>
@@ -837,11 +826,54 @@
   </div>
 </div>
 
+<!-- CONFIRM CLEAR MODAL -->
+<div class="confirm-modal-overlay" id="confirm-modal">
+  <div class="confirm-modal">
+    <div class="icon">⚠️</div>
+    <h3>Clear All Data?</h3>
+    <p>This will permanently delete all <strong id="confirm-count">0</strong> entries from Local Storage.<br>This action <strong>cannot be undone.</strong></p>
+    <div class="confirm-modal-btns">
+      <button class="btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+      <button class="btn-danger" onclick="clearAllData()">🗑️ Yes, Delete All</button>
+    </div>
+  </div>
+</div>
+
 <script>
+  // ════════════════════════════════
+  //  LOCAL STORAGE KEY
+  // ════════════════════════════════
+  const LS_KEY = 'mmroadways_rejected_forms';
+
+  // ─── Read all records from localStorage ───
+  function lsGetAll() {
+    try {
+      return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+    } catch { return []; }
+  }
+
+  // ─── Save all records to localStorage ───
+  function lsSaveAll(rows) {
+    localStorage.setItem(LS_KEY, JSON.stringify(rows));
+  }
+
+  // ─── Add a single record ───
+  function lsAddRecord(data) {
+    const rows = lsGetAll();
+    const record = {
+      id: 'loc_' + Date.now() + '_' + Math.random().toString(36).substr(2,6),
+      _source: 'local',
+      savedAt: new Date().toISOString(),
+      ...data
+    };
+    rows.unshift(record); // newest first
+    lsSaveAll(rows);
+    return record;
+  }
+
   // ─── State ───
-  let allRows = [];            // Firebase rows
-  let importedRows = [];       // Locally imported rows (session only)
-  let pendingImportRows = [];  // Rows parsed from Excel, waiting for confirmation
+  let importedRows    = []; // session-only import preview
+  let pendingImportRows = [];
 
   // ─── Tab switching ───
   function switchTab(tab) {
@@ -850,6 +882,14 @@
     document.getElementById('section-' + tab).classList.add('active');
     document.getElementById('tab-' + tab).classList.add('active');
     if (tab === 'report') loadReport();
+    updateEntryCounter();
+  }
+
+  // ─── Update record count shown in entry page ───
+  function updateEntryCounter() {
+    const count = lsGetAll().length;
+    const el = document.getElementById('storage-count-entry');
+    if (el) el.textContent = count + ' record' + (count !== 1 ? 's' : '') + ' saved';
   }
 
   // ─── Validation ───
@@ -857,53 +897,49 @@
     let ok = true;
     const fields = [
       { id: 'created_date', err: 'err-date' },
-      { id: 'vehicle', err: 'err-vehicle' },
+      { id: 'vehicle',      err: 'err-vehicle' },
       { id: 'rejected_reason', err: 'err-reason' },
-      { id: 'name', err: 'err-name' },
+      { id: 'name',         err: 'err-name' },
     ];
     fields.forEach(f => {
-      const el = document.getElementById(f.id);
+      const el  = document.getElementById(f.id);
       const err = document.getElementById(f.err);
       if (!el.value.trim()) {
-        el.classList.add('error');
-        err.style.display = 'block';
-        ok = false;
+        el.classList.add('error'); err.style.display = 'block'; ok = false;
       } else {
-        el.classList.remove('error');
-        err.style.display = 'none';
+        el.classList.remove('error'); err.style.display = 'none';
       }
     });
     return ok;
   }
 
-  // ─── Submit form ───
-  async function submitForm() {
+  // ─── Submit form → save to localStorage ───
+  function submitForm() {
     if (!validate()) return;
-    if (!window.__firebaseReady) { showToast('Firebase not ready, try again.', 'error'); return; }
 
-    const btn = document.getElementById('submit-btn');
+    const btn     = document.getElementById('submit-btn');
     const btnText = document.getElementById('btn-text');
-    btn.disabled = true;
+    btn.disabled  = true;
     btnText.innerHTML = '<span class="spinner"></span> Saving…';
 
     const data = {
-      createdDate: document.getElementById('created_date').value,
-      vehicle: document.getElementById('vehicle').value.trim().toUpperCase(),
+      createdDate:    document.getElementById('created_date').value,
+      vehicle:        document.getElementById('vehicle').value.trim().toUpperCase(),
       rejectedReason: document.getElementById('rejected_reason').value.trim(),
-      name: document.getElementById('name').value.trim(),
-      submittedAt: window.__serverTimestamp()
+      name:           document.getElementById('name').value.trim(),
     };
 
     try {
-      await window.__addDoc(window.__collection(window.__db, 'rejected_forms'), data);
-      showToast('✅ Entry submitted successfully!');
+      lsAddRecord(data);
+      showToast('✅ Entry saved to Local Storage!');
       resetForm();
+      updateEntryCounter();
     } catch (err) {
       console.error(err);
-      showToast('❌ Failed to save. Check your connection.', 'error');
+      showToast('❌ Failed to save. Storage might be full.', 'error');
     } finally {
       btn.disabled = false;
-      btnText.innerHTML = '💾 Submit Entry';
+      btnText.innerHTML = '💾 Save Entry';
     }
   }
 
@@ -926,61 +962,37 @@
     setTimeout(() => t.className = 'toast', 3400);
   }
 
-  // ─── Load report from Firebase ───
-  async function loadReport() {
-    if (!window.__firebaseReady) {
-      setTimeout(loadReport, 500); return;
-    }
-    const tbody = document.getElementById('report-tbody');
-    tbody.innerHTML = '<tr><td colspan="7"><div class="no-data"><div class="icon">🔄</div><p>Loading…</p></div></td></tr>';
-    try {
-      const q = window.__query(
-        window.__collection(window.__db, 'rejected_forms'),
-        window.__orderBy('submittedAt', 'desc')
-      );
-      const snap = await window.__getDocs(q);
-      allRows = [];
-      snap.forEach(doc => allRows.push({ id: doc.id, _source: 'firebase', ...doc.data() }));
-      renderCombinedTable();
-    } catch (err) {
-      console.error(err);
-      tbody.innerHTML = '<tr><td colspan="7"><div class="no-data"><div class="icon">⚠️</div><p>Failed to load data.</p></div></td></tr>';
-    }
+  // ─── Load report ───
+  function loadReport() {
+    const allRows = lsGetAll();
+    renderTable(allRows);
+    updateStats(allRows);
   }
 
-  // ─── Combine Firebase + Imported rows and render ───
-  function renderCombinedTable(filterQuery = '') {
-    const combined = [...importedRows, ...allRows];
+  function renderTable(rows, filterQuery = '') {
     const q = filterQuery.toLowerCase();
     const filtered = q
-      ? combined.filter(r =>
+      ? rows.filter(r =>
           (r.name || '').toLowerCase().includes(q) ||
           (r.vehicle || '').toLowerCase().includes(q) ||
           (r.rejectedReason || '').toLowerCase().includes(q)
         )
-      : combined;
+      : rows;
 
-    renderTable(filtered);
-    updateStats(combined);
-  }
-
-  function renderTable(rows) {
     const tbody = document.getElementById('report-tbody');
-    if (!rows.length) {
+    if (!filtered.length) {
       tbody.innerHTML = '<tr><td colspan="7"><div class="no-data"><div class="icon">📭</div><p>No entries found.</p></div></td></tr>';
       return;
     }
-    tbody.innerHTML = rows.map((r, i) => {
-      let submAt = '—';
-      if (r._source === 'import') {
-        submAt = '<em style="color:var(--text-muted);font-size:12px;">Imported</em>';
-      } else if (r.submittedAt?.toDate) {
-        submAt = r.submittedAt.toDate().toLocaleString('en-IN');
-      }
+
+    tbody.innerHTML = filtered.map((r, i) => {
+      const savedAt = r.savedAt
+        ? new Date(r.savedAt).toLocaleString('en-IN')
+        : '—';
 
       const sourceTag = r._source === 'import'
         ? '<span class="source-tag source-import">📂 Imported</span>'
-        : '<span class="source-tag source-firebase">🔥 Live</span>';
+        : '<span class="source-tag source-local">💾 Local</span>';
 
       return `
         <tr>
@@ -989,7 +1001,7 @@
           <td><span class="badge badge-blue">${r.vehicle || '—'}</span></td>
           <td style="max-width:260px;white-space:pre-wrap;word-break:break-word;">${r.rejectedReason || '—'}</td>
           <td><b>${r.name || '—'}</b></td>
-          <td style="white-space:nowrap;font-size:12px;color:var(--text-muted);">${submAt}</td>
+          <td style="white-space:nowrap;font-size:12px;color:var(--text-muted);">${savedAt}</td>
           <td>${sourceTag}</td>
         </tr>`;
     }).join('');
@@ -998,240 +1010,205 @@
   function updateStats(rows) {
     document.getElementById('stat-total').textContent = rows.length;
     const today = new Date().toISOString().split('T')[0];
-    const todayCount = rows.filter(r => r.createdDate === today).length;
-    document.getElementById('stat-today').textContent = todayCount;
-    const uniq = new Set(rows.map(r => r.vehicle)).size;
-    document.getElementById('stat-vehicles').textContent = uniq;
-    const impCount = rows.filter(r => r._source === 'import').length;
-    document.getElementById('stat-imported').textContent = impCount;
+    document.getElementById('stat-today').textContent   = rows.filter(r => r.createdDate === today).length;
+    document.getElementById('stat-vehicles').textContent = new Set(rows.map(r => r.vehicle)).size;
+    document.getElementById('stat-imported').textContent = rows.filter(r => r._source === 'import').length;
   }
 
   function filterTable() {
     const q = document.getElementById('search-input').value;
-    renderCombinedTable(q);
+    const rows = lsGetAll();
+    renderTable(rows, q);
   }
 
-  // ════════════════════════════════════════
-  //  IMPORT FROM EXCEL — CORE LOGIC
-  // ════════════════════════════════════════
+  // ─── Clear all data ───
+  function confirmClearAll() {
+    const count = lsGetAll().length;
+    document.getElementById('confirm-count').textContent = count;
+    document.getElementById('confirm-modal').classList.add('open');
+  }
 
-  /**
-   * Called when user picks a file.
-   * Reads + parses the Excel/CSV, shows preview modal.
-   */
+  function closeConfirmModal() {
+    document.getElementById('confirm-modal').classList.remove('open');
+  }
+
+  function clearAllData() {
+    localStorage.removeItem(LS_KEY);
+    closeConfirmModal();
+    loadReport();
+    updateEntryCounter();
+    showToast('🗑️ All data cleared!', 'warning');
+  }
+
+  // ════════════════════════════════
+  //  IMPORT FROM EXCEL
+  // ════════════════════════════════
   function handleImportFile(event) {
     const file = event.target.files[0];
     if (!file) return;
-
-    // Reset file input so same file can be re-selected
     event.target.value = '';
 
     const reader = new FileReader();
     reader.onload = function(e) {
       try {
-        const data = new Uint8Array(e.target.result);
+        const data     = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-
-        // Use first sheet
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-
-        // Convert to JSON (header row = first row)
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-          defval: '',
-          raw: false,
-          dateNF: 'yyyy-mm-dd'
-        });
+        const ws       = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false, dateNF: 'yyyy-mm-dd' });
 
         if (!jsonData.length) {
-          showToast('⚠️ Excel file is empty or has no data rows.', 'warning');
-          return;
+          showToast('⚠️ Excel file is empty.', 'warning'); return;
         }
-
         parseAndPreviewRows(jsonData, file.name);
       } catch (err) {
-        console.error('Excel parse error:', err);
-        showToast('❌ Could not read the Excel file. Make sure it is a valid .xlsx or .xls file.', 'error');
+        console.error(err);
+        showToast('❌ Could not read Excel file.', 'error');
       }
     };
     reader.readAsArrayBuffer(file);
   }
 
-  /**
-   * Flexible column mapper — tries many possible column name variations
-   * so the import works even if headers are slightly different.
-   */
   function findColumn(headers, aliases) {
     for (const alias of aliases) {
-      const match = headers.find(h => h.toLowerCase().replace(/[\s_\-]/g, '').includes(alias.toLowerCase().replace(/[\s_\-]/g, '')));
+      const match = headers.find(h =>
+        h.toLowerCase().replace(/[\s_\-]/g, '').includes(alias.toLowerCase().replace(/[\s_\-]/g, ''))
+      );
       if (match) return match;
     }
     return null;
   }
 
   function parseAndPreviewRows(jsonData, fileName) {
-    const headers = Object.keys(jsonData[0]);
-
-    // Map columns flexibly
-    const colDate    = findColumn(headers, ['createddate', 'created_date', 'date', 'Created Date', 'Date']);
-    const colVehicle = findColumn(headers, ['vehicle', 'vehicleno', 'vehicle_no', 'bus', 'Vehicle']);
-    const colReason  = findColumn(headers, ['rejectedreason', 'rejected_reason', 'reason', 'rejection', 'Rejected Reason']);
-    const colName    = findColumn(headers, ['createdname', 'created_name', 'name', 'employee', 'Created Name']);
+    const headers    = Object.keys(jsonData[0]);
+    const colDate    = findColumn(headers, ['createddate','created_date','date','Date']);
+    const colVehicle = findColumn(headers, ['vehicle','vehicleno','vehicle_no','bus','Vehicle']);
+    const colReason  = findColumn(headers, ['rejectedreason','rejected_reason','reason','rejection','Rejected Reason']);
+    const colName    = findColumn(headers, ['createdname','created_name','name','employee','Created Name']);
 
     pendingImportRows = jsonData.map((row, idx) => {
-      const rawDate    = colDate    ? String(row[colDate] || '').trim()    : '';
+      const rawDate    = colDate    ? String(row[colDate]    || '').trim() : '';
       const rawVehicle = colVehicle ? String(row[colVehicle] || '').trim() : '';
-      const rawReason  = colReason  ? String(row[colReason] || '').trim()  : '';
-      const rawName    = colName    ? String(row[colName] || '').trim()    : '';
-
-      // Normalise date — accept yyyy-mm-dd, dd/mm/yyyy, dd-mm-yyyy, mm/dd/yyyy
-      const normDate = normaliseDate(rawDate);
-
-      const isValid = normDate && rawVehicle && rawReason && rawName;
+      const rawReason  = colReason  ? String(row[colReason]  || '').trim() : '';
+      const rawName    = colName    ? String(row[colName]    || '').trim() : '';
+      const normDate   = normaliseDate(rawDate);
+      const isValid    = normDate && rawVehicle && rawReason && rawName;
 
       return {
-        _rowIndex: idx + 2,  // Excel row number (1-indexed header + 1)
+        _rowIndex: idx + 2,
         _valid: isValid,
         _skipReason: !isValid ? getMissingFields(normDate, rawVehicle, rawReason, rawName) : '',
         createdDate: normDate,
         vehicle: rawVehicle.toUpperCase(),
         rejectedReason: rawReason,
         name: rawName,
-        _source: 'import'
+        _source: 'import',
+        savedAt: new Date().toISOString()
       };
     });
 
-    const validCount  = pendingImportRows.filter(r => r._valid).length;
-    const skipCount   = pendingImportRows.length - validCount;
+    const validCount = pendingImportRows.filter(r => r._valid).length;
+    const skipCount  = pendingImportRows.length - validCount;
 
-    // Build info bar
-    const infoBar = document.getElementById('import-info-bar');
-    infoBar.innerHTML = `
+    document.getElementById('import-info-bar').innerHTML = `
       <span class="import-info-chip">📄 File: ${fileName}</span>
       <span class="import-info-chip">📋 Total rows: ${pendingImportRows.length}</span>
       <span class="import-info-chip green">✅ Valid: ${validCount}</span>
       ${skipCount > 0 ? `<span class="import-info-chip orange">⚠️ Skipped: ${skipCount}</span>` : ''}
     `;
 
-    // Build preview table
-    const previewTbody = document.getElementById('preview-tbody');
-    previewTbody.innerHTML = pendingImportRows.map((r, i) => {
-      const statusBadge = r._valid
+    document.getElementById('preview-tbody').innerHTML = pendingImportRows.map((r, i) => {
+      const badge    = r._valid
         ? `<span class="ok-badge">✅ OK</span>`
         : `<span class="skip-badge">⚠️ Skip — ${r._skipReason}</span>`;
-      const rowClass = r._valid ? '' : 'row-skip';
       return `
-        <tr class="${rowClass}">
-          <td>${i + 1}</td>
-          <td>${statusBadge}</td>
-          <td>${r.createdDate || '—'}</td>
-          <td>${r.vehicle || '—'}</td>
+        <tr class="${r._valid ? '' : 'row-skip'}">
+          <td>${i + 1}</td><td>${badge}</td>
+          <td>${r.createdDate || '—'}</td><td>${r.vehicle || '—'}</td>
           <td style="max-width:220px;word-break:break-word;">${r.rejectedReason || '—'}</td>
           <td>${r.name || '—'}</td>
         </tr>`;
     }).join('');
 
-    // Update confirm button label
     document.getElementById('confirm-import-text').textContent = `✅ Import ${validCount} Valid Row${validCount !== 1 ? 's' : ''}`;
-
-    if (validCount === 0) {
-      document.getElementById('confirm-import-btn').disabled = true;
-    } else {
-      document.getElementById('confirm-import-btn').disabled = false;
-    }
-
+    document.getElementById('confirm-import-btn').disabled = validCount === 0;
     openImportModal();
   }
 
   function getMissingFields(date, vehicle, reason, name) {
-    const missing = [];
-    if (!date)    missing.push('Date');
-    if (!vehicle) missing.push('Vehicle');
-    if (!reason)  missing.push('Reason');
-    if (!name)    missing.push('Name');
-    return missing.join(', ') + ' missing';
+    const m = [];
+    if (!date)    m.push('Date');
+    if (!vehicle) m.push('Vehicle');
+    if (!reason)  m.push('Reason');
+    if (!name)    m.push('Name');
+    return m.join(', ') + ' missing';
   }
 
-  /**
-   * Normalise various date formats to yyyy-mm-dd
-   */
   function normaliseDate(raw) {
     if (!raw) return '';
-
-    // Already yyyy-mm-dd
     if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
-
-    // dd/mm/yyyy or dd-mm-yyyy
     const dmy = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
     if (dmy) {
       const d = dmy[1].padStart(2,'0'), m = dmy[2].padStart(2,'0'), y = dmy[3];
       if (parseInt(m) > 0 && parseInt(m) <= 12) return `${y}-${m}-${d}`;
     }
-
-    // mm/dd/yyyy (US style) — if first segment > 12 it must be day
-    const mdy = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-    if (mdy) {
-      const a = parseInt(mdy[1]), b = parseInt(mdy[2]);
-      if (a > 12 && b <= 12) {
-        return `${mdy[3]}-${mdy[2].padStart(2,'0')}-${mdy[1].padStart(2,'0')}`;
-      }
-    }
-
-    // Try JS Date parse as fallback
     const d = new Date(raw);
-    if (!isNaN(d.getTime())) {
-      return d.toISOString().split('T')[0];
-    }
-
+    if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
     return '';
   }
 
-  // ─── Confirm import ───
+  // ─── Confirm import → save to localStorage ───
   async function confirmImport() {
     const validRows = pendingImportRows.filter(r => r._valid);
     if (!validRows.length) return;
 
-    const btn = document.getElementById('confirm-import-btn');
+    const btn     = document.getElementById('confirm-import-btn');
     const btnText = document.getElementById('confirm-import-text');
-    btn.disabled = true;
-    btnText.innerHTML = '<span class="spinner"></span> Importing…';
+    btn.disabled  = true;
+    btnText.innerHTML = '<span class="spinner"></span> Saving…';
 
-    // Show progress
-    const progressWrap = document.getElementById('progress-wrap');
-    const progressBar  = document.getElementById('progress-bar');
+    const progressWrap  = document.getElementById('progress-wrap');
+    const progressBar   = document.getElementById('progress-bar');
     const progressLabel = document.getElementById('progress-label');
-    progressWrap.style.display = 'block';
+    progressWrap.style.display  = 'block';
     progressLabel.style.display = 'block';
 
-    // Simulate row-by-row addition with progress (instant, just visual delay for UX)
+    // Save all valid rows to localStorage
+    const existing = lsGetAll();
     for (let i = 0; i < validRows.length; i++) {
-      importedRows.unshift(validRows[i]); // Add to front (newest first)
+      const r = validRows[i];
+      existing.unshift({
+        id: 'imp_' + Date.now() + '_' + i,
+        _source: 'import',
+        savedAt: new Date().toISOString(),
+        createdDate: r.createdDate,
+        vehicle: r.vehicle,
+        rejectedReason: r.rejectedReason,
+        name: r.name
+      });
       const pct = Math.round(((i + 1) / validRows.length) * 100);
-      progressBar.style.width = pct + '%';
-      progressLabel.textContent = `Importing row ${i + 1} of ${validRows.length}…`;
-      // Small yield to let UI update
+      progressBar.style.width    = pct + '%';
+      progressLabel.textContent  = `Saving row ${i + 1} of ${validRows.length}…`;
       if (i % 10 === 0) await new Promise(r => setTimeout(r, 8));
     }
+    lsSaveAll(existing);
 
-    progressLabel.textContent = `✅ ${validRows.length} rows imported successfully!`;
-    progressBar.style.width = '100%';
-
+    progressLabel.textContent = `✅ ${validRows.length} rows saved to Local Storage!`;
+    progressBar.style.width   = '100%';
     await new Promise(r => setTimeout(r, 600));
 
     closeImportModal();
-    renderCombinedTable(document.getElementById('search-input').value);
-    showToast(`✅ ${validRows.length} rows imported from Excel!`);
+    loadReport();
+    updateEntryCounter();
+    showToast(`✅ ${validRows.length} rows imported & saved!`);
 
-    // Reset
-    btn.disabled = false;
-    btnText.textContent = '✅ Import Valid Rows';
-    progressWrap.style.display = 'none';
-    progressBar.style.width = '0%';
+    btn.disabled          = false;
+    btnText.textContent   = '✅ Import Valid Rows';
+    progressWrap.style.display  = 'none';
+    progressBar.style.width     = '0%';
     progressLabel.style.display = 'none';
     pendingImportRows = [];
   }
 
-  // ─── Modal helpers ───
   function openImportModal() {
     document.getElementById('import-modal').classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -1243,111 +1220,81 @@
     pendingImportRows = [];
   }
 
-  // Close modal on backdrop click
   document.getElementById('import-modal').addEventListener('click', function(e) {
     if (e.target === this) closeImportModal();
   });
 
-  // ─── Export Excel (proper .xlsx with SheetJS) ───
+  document.getElementById('confirm-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeConfirmModal();
+  });
+
+  // ─── Export Excel ───
   function exportExcel() {
-    const combined = [...importedRows, ...allRows];
-    if (!combined.length) { showToast('No data to export!', 'error'); return; }
+    const rows = lsGetAll();
+    if (!rows.length) { showToast('No data to export!', 'error'); return; }
 
-    const headers = ['S.No', 'Created Date', 'Vehicle', 'Rejected Reason', 'Created Name', 'Submitted At', 'Source'];
+    const headers  = ['S.No', 'Created Date', 'Vehicle', 'Rejected Reason', 'Created Name', 'Saved At', 'Source'];
+    const dataRows = rows.map((r, i) => [
+      i + 1,
+      r.createdDate || '',
+      r.vehicle || '',
+      r.rejectedReason || '',
+      r.name || '',
+      r.savedAt ? new Date(r.savedAt).toLocaleString('en-IN') : '',
+      r._source === 'import' ? 'Imported' : 'Local'
+    ]);
 
-    const dataRows = combined.map((r, i) => {
-      let submAt = '';
-      if (r._source === 'import') {
-        submAt = 'Imported';
-      } else if (r.submittedAt?.toDate) {
-        submAt = r.submittedAt.toDate().toLocaleString('en-IN');
-      }
-      return [
-        i + 1,
-        r.createdDate || '',
-        r.vehicle || '',
-        r.rejectedReason || '',
-        r.name || '',
-        submAt,
-        r._source === 'import' ? 'Imported' : 'Firebase'
-      ];
-    });
-
-    const wsData = [headers, ...dataRows];
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-    ws['!cols'] = [
-      { wch: 6 }, { wch: 14 }, { wch: 16 }, { wch: 40 }, { wch: 22 }, { wch: 22 }, { wch: 12 }
-    ];
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...dataRows]);
+    ws['!cols'] = [{ wch:6 },{ wch:14 },{ wch:16 },{ wch:40 },{ wch:22 },{ wch:22 },{ wch:10 }];
 
     headers.forEach((h, c) => {
-      const cellRef = XLSX.utils.encode_cell({ r: 0, c });
-      if (!ws[cellRef]) return;
-      ws[cellRef].s = {
-        font: { bold: true, color: { rgb: 'FFFFFF' } },
-        fill: { fgColor: { rgb: '1A56A4' } },
-        alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
-        border: {
-          top: { style: 'thin', color: { rgb: 'AAAAAA' } },
-          bottom: { style: 'thin', color: { rgb: 'AAAAAA' } },
-          left: { style: 'thin', color: { rgb: 'AAAAAA' } },
-          right: { style: 'thin', color: { rgb: 'AAAAAA' } }
-        }
+      const ref = XLSX.utils.encode_cell({ r:0, c });
+      if (!ws[ref]) return;
+      ws[ref].s = {
+        font: { bold:true, color:{ rgb:'FFFFFF' } },
+        fill: { fgColor:{ rgb:'1A56A4' } },
+        alignment: { horizontal:'center', vertical:'center', wrapText:true }
       };
     });
 
     dataRows.forEach((row, r) => {
       row.forEach((_, c) => {
-        const cellRef = XLSX.utils.encode_cell({ r: r + 1, c });
-        if (!ws[cellRef]) ws[cellRef] = { v: '', t: 's' };
-        ws[cellRef].s = {
-          fill: { fgColor: { rgb: r % 2 === 0 ? 'EBF2FF' : 'FFFFFF' } },
-          alignment: { vertical: 'center', wrapText: true },
-          border: {
-            top:    { style: 'thin', color: { rgb: 'CCCCCC' } },
-            bottom: { style: 'thin', color: { rgb: 'CCCCCC' } },
-            left:   { style: 'thin', color: { rgb: 'CCCCCC' } },
-            right:  { style: 'thin', color: { rgb: 'CCCCCC' } }
-          }
+        const ref = XLSX.utils.encode_cell({ r: r+1, c });
+        if (!ws[ref]) ws[ref] = { v:'', t:'s' };
+        ws[ref].s = {
+          fill: { fgColor:{ rgb: r % 2 === 0 ? 'EBF2FF' : 'FFFFFF' } },
+          alignment: { vertical:'center', wrapText:true }
         };
       });
     });
 
-    ws['!freeze'] = { xSplit: 0, ySplit: 1, topLeftCell: 'A2', activePane: 'bottomLeft' };
-
-    const wb = XLSX.utils.book_new();
+    const wb  = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Rejected Forms');
 
     const today = new Date().toISOString().split('T')[0];
-    const todayCount = combined.filter(r => r.createdDate === today).length;
-    const uniqVehicles = [...new Set(combined.map(r => r.vehicle))];
-    const importCount = importedRows.length;
-
-    const summaryData = [
-      ['MMROADWAYS — Settlement Rejected Forms Summary'],
-      [''],
+    const summary = [
+      ['MMROADWAYS — Settlement Rejected Forms Summary'],[''],
       ['Report Generated', new Date().toLocaleString('en-IN')],
-      ['Total Entries', combined.length],
-      ['Firebase Entries', allRows.length],
-      ['Imported Entries', importCount],
-      ["Today's Entries", todayCount],
-      ['Unique Vehicles', uniqVehicles.length],
+      ['Total Entries', rows.length],
+      ['Local Entries', rows.filter(r => r._source !== 'import').length],
+      ['Imported Entries', rows.filter(r => r._source === 'import').length],
+      ["Today's Entries", rows.filter(r => r.createdDate === today).length],
+      ['Unique Vehicles', new Set(rows.map(r => r.vehicle)).size],
       [''],
-      ['Vehicles List', uniqVehicles.join(', ')]
+      ['Vehicles List', [...new Set(rows.map(r => r.vehicle))].join(', ')]
     ];
-    const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
-    wsSummary['!cols'] = [{ wch: 22 }, { wch: 40 }];
+    const wsSummary = XLSX.utils.aoa_to_sheet(summary);
+    wsSummary['!cols'] = [{ wch:22 },{ wch:40 }];
     XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
 
     XLSX.writeFile(wb, 'MMROADWAYS_Rejected_Forms_' + today + '.xlsx');
     showToast('📥 Excel file downloaded!');
   }
 
-  // ─── Export as Image (html2canvas) ───
+  // ─── Export as Image ───
   async function exportImage() {
-    const combined = [...importedRows, ...allRows];
-    if (!combined.length) { showToast('No data to export!', 'error'); return; }
-
+    const rows = lsGetAll();
+    if (!rows.length) { showToast('No data to export!', 'error'); return; }
     showToast('🖼️ Generating image…');
 
     if (!window.html2canvas) {
@@ -1360,61 +1307,52 @@
     }
 
     const wrap = document.createElement('div');
-    wrap.style.cssText = `
-      position:fixed; left:-9999px; top:0;
-      font-family:'Poppins',sans-serif; background:#fff;
-      padding:28px 32px; width:900px;
-    `;
-
+    wrap.style.cssText = 'position:fixed;left:-9999px;top:0;font-family:Poppins,sans-serif;background:#fff;padding:28px 32px;width:900px;';
     const today = new Date().toLocaleDateString('en-IN');
+
     wrap.innerHTML = `
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #dbe4f0;">
         <div style="background:linear-gradient(135deg,#1a56a4,#2563eb);color:white;width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;">🚌</div>
         <div>
-          <div style="font-size:18px;font-weight:700;color:#1a56a4;font-family:'Georgia',serif;">MMROADWAYS</div>
+          <div style="font-size:18px;font-weight:700;color:#1a56a4;font-family:Georgia,serif;">MMROADWAYS</div>
           <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Settlement Rejected Forms Report</div>
         </div>
         <div style="margin-left:auto;text-align:right;font-size:12px;color:#64748b;">
-          Generated: ${today}<br>Total Records: ${combined.length}
+          Generated: ${today}<br>Total Records: ${rows.length}
         </div>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
         <thead>
           <tr style="background:linear-gradient(90deg,#1a56a4,#2563eb);">
-            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">#</th>
-            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Created Date</th>
-            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Vehicle</th>
-            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Rejected Reason</th>
-            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Created Name</th>
-            <th style="color:white;padding:10px 12px;text-align:left;font-weight:600;">Source</th>
+            <th style="color:white;padding:10px 12px;text-align:left;">#</th>
+            <th style="color:white;padding:10px 12px;text-align:left;">Created Date</th>
+            <th style="color:white;padding:10px 12px;text-align:left;">Vehicle</th>
+            <th style="color:white;padding:10px 12px;text-align:left;">Rejected Reason</th>
+            <th style="color:white;padding:10px 12px;text-align:left;">Created Name</th>
+            <th style="color:white;padding:10px 12px;text-align:left;">Source</th>
           </tr>
         </thead>
         <tbody>
-          ${combined.map((r, i) => {
-            let submAt = r._source === 'import' ? 'Imported' : (r.submittedAt?.toDate ? r.submittedAt.toDate().toLocaleString('en-IN') : '—');
-            const bg = i % 2 === 0 ? '#f0f5ff' : '#ffffff';
-            return `<tr style="background:${bg};border-bottom:1px solid #dbe4f0;">
+          ${rows.map((r, i) => `
+            <tr style="background:${i%2===0?'#f0f5ff':'#ffffff'};border-bottom:1px solid #dbe4f0;">
               <td style="padding:9px 12px;font-weight:700;color:#1a56a4;">${i+1}</td>
-              <td style="padding:9px 12px;">${r.createdDate || '—'}</td>
-              <td style="padding:9px 12px;"><span style="background:#dbeafe;color:#1d4ed8;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;">${r.vehicle || '—'}</span></td>
-              <td style="padding:9px 12px;max-width:220px;word-break:break-word;">${r.rejectedReason || '—'}</td>
-              <td style="padding:9px 12px;font-weight:600;">${r.name || '—'}</td>
-              <td style="padding:9px 12px;font-size:11px;color:#64748b;">${r._source === 'import' ? '📂 Imported' : '🔥 Live'}</td>
-            </tr>`;
-          }).join('')}
+              <td style="padding:9px 12px;">${r.createdDate||'—'}</td>
+              <td style="padding:9px 12px;"><span style="background:#dbeafe;color:#1d4ed8;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;">${r.vehicle||'—'}</span></td>
+              <td style="padding:9px 12px;max-width:220px;word-break:break-word;">${r.rejectedReason||'—'}</td>
+              <td style="padding:9px 12px;font-weight:600;">${r.name||'—'}</td>
+              <td style="padding:9px 12px;font-size:11px;color:#64748b;">${r._source==='import'?'📂 Imported':'💾 Local'}</td>
+            </tr>`).join('')}
         </tbody>
       </table>
       <div style="margin-top:16px;font-size:11px;color:#94a3b8;text-align:center;">
         MMROADWAYS — Settlement Rejected Forms • ${today}
-      </div>
-    `;
+      </div>`;
 
     document.body.appendChild(wrap);
-
     try {
-      const canvas = await html2canvas(wrap, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      const canvas = await html2canvas(wrap, { scale:2, useCORS:true, backgroundColor:'#ffffff' });
       const a = document.createElement('a');
-      a.href = canvas.toDataURL('image/png');
+      a.href     = canvas.toDataURL('image/png');
       a.download = 'MMROADWAYS_Report_' + new Date().toISOString().split('T')[0] + '.png';
       a.click();
       showToast('🖼️ Image downloaded!');
@@ -1425,13 +1363,9 @@
     }
   }
 
-  // ─── Set today as default date ───
+  // ─── Init ───
   document.getElementById('created_date').value = new Date().toISOString().split('T')[0];
-
-  // ─── Firebase ready listener ───
-  window.addEventListener('firebaseReady', () => {
-    console.log('Firebase ready ✅');
-  });
+  updateEntryCounter();
 </script>
 </body>
 </html>
